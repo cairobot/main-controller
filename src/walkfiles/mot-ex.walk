@@ -1,0 +1,22 @@
+@/
+version=0.0
+/@
+
+[info]
+        Name=Mot Test
+        Id=100
+        Speed=1
+        Version=0.0
+        Tick=400
+        Looping=true
+        Use=prg
+[end]
+
+[setup]
+        >d0..12,:0
+[end]
+
+[prg]
+        >d0,d191,d0,d191,d0..8,
+        >d191,d0,d191,d0,d0..8,
+[end]

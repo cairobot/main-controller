@@ -1,0 +1,159 @@
+@/                                              # file type info comment
+version=0.0                                     # the version of the file
+/@
+
+# general file info and program parameters
+[info]
+        Name=Test                               # program name
+        Id=13                                   # program id
+        Speed=1                                 # predicted speed of robot
+        Version=1.0                             # version of program
+        Looping=true                            # should the program loop
+        Tick=1000                               # the tick in milliseconds (every step is Tick ms apart) - this is the default value, it can be overridden, by appending
+                                                # :<tick in ms> to the step instruction (example: 1..5,3..7,:3), which would result in a delay of 3ms, instead of 1000.
+        Use=prg                                 # acceptable values: prg, mot; if not defined, then the fallback is prg
+                                                # this defines if the prg routine is to be used or the m0..12 functions for computing the positions
+[end]
+
+# steps for preparing the program
+# this is ececuted once before the program begins to run, regardless, if the program loops or not.
+# it is mandatory, that this definition exists
+[setup]
+        >10..12,:100
+[end]
+
+# the program to run
+[prg]
+        >1..3,r10..4,d100,0..4,:20              
+                                                # a move instruction always begins with a closing pointy bracket ('>') followed by motor positions seperated by commas (',') (note, that the last position argument must also be followed by a comma) the positions can be given in two forms: single and multi
+                                                # single is just the value preceeded by an optional character denoting the radix of the value (d for degrees, r for radians and nothing for raw values)
+                                                # example: `>1,d3,r1000,` would set the positions like this:
+                                                #     servo 0: 1
+                                                #     servo 1: 3 degrees
+                                                #     servo 2: 1.0 radians
+                                                # servos 3-11: *unmodified* (0)
+                                                # note, that radians is specified as an int, which is 1000 times the desired value, if one would want to set the servo to 90 deg, then they would either write `d90` or `r1571`
+                                                # the multi is an extension of the single version, used to set n servos to a specific position
+                                                # syntax: `single..n` where n is the number of servos
+                                                # example: `>d10..3,`
+                                                # this would set the first 3 servos to 10 degrees and leave all others unmodified (0)
+                                                # an override for a tick delay can be specified, it is just appended to the end of the command using a colon (':')
+                                                # example: `>d10..3,:10`
+                                                # would use a 10ms delay until the next step occures
+        >2..12,
+        >3..12,
+        >4..12,
+        >5..12,
+        >6..12,
+[end]
+
+# function definitions for motors 0 to 11
+# a motor can have more than one function, and every function specifies an interval it is valid in, and the function itself
+# every function definition is preceeded by a line containing only a dash ('-')
+[m0]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
+
+[m1]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
+
+[m2]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
+
+[m3]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
+
+[m4]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
+
+[m5]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
+
+[m6]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
+
+[m7]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
+
+[m8]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
+
+[m9]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
+
+[m10]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
+
+[m11]
+        -
+        Interval=[100,10000]
+        Function=2*3*t
+        -
+        Interval=[10000,20000]
+        Function=t*sin(t)
+[end]
