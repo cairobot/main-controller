@@ -67,6 +67,15 @@ class Server:
                                 self.server.logger.info("selected program: " + argv[0])
                                 self.server.fw.selectProgram(argv[0])
 
+        class CommandFWDeselect(cmd_line.Command):
+
+                def __init__(self, hdlr, server):
+                        cmd_line.Command.__init__(self, hdlr)
+                        self.server = server
+
+                def do(self, argv):
+                        self.hdlr.doCmd('fwselect', [])
+
         class CommandStop(cmd_line.Command):
 
                 def __init__(self, hdlr, server):
