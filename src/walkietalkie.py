@@ -678,8 +678,9 @@ class FileWalker(Walker):
         ##
         # Initializes all fields of this object to 0, None or empty list.
         # @param motd   the MotorDistributor to use for data transfere
-        def __init__(self, motd):
+        def __init__(self, motd, logger):
                 Walker.__init__(self)
+                self.logger = logger
                 self.motd = motd
                 self.prgs = {}
                 self.select = None
@@ -715,8 +716,9 @@ class FileWalker(Walker):
         # @param name   the name of the program to load
         # @returns      wheter selection was successful or not
         def selectProgram(self, name):
-                if self.select != None:
-                        return False
+                if self.select != None and name == None:
+                        self.should_stop = True
+                        return True
                 if name in self.prgs:
                         self.should_stop = False
                         self.pos = 0
@@ -824,14 +826,16 @@ class FileWalker(Walker):
                 sttime = _getTime()
                 stp = self.getNextStep()
                 if stp != None:
+                        self.logger.debug("stepping: " + repr(stp))
                         self.is_stop = False
                         self.doStep(stp)
                         self.setNextDiff(stp.delay)
                 else:
                         self.is_stop = True
                         self.setNextDiff(self.select.tick)
+                        self.selectProgram(None)
 
-                logger.DefaultLogger.debug('exec_time: ' + str(_getTime() - sttime))
+                self.logger.debug('exec_time: ' + str(_getTime() - sttime))
                 self.time = _getTime()
 
 #
