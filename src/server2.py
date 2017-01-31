@@ -207,7 +207,7 @@ class Server:
                 if self.fw != None and self.fw_run:
                         # self.logger.debug('tick!')
                         self.fw.doTick()
-                time.sleep(0.5)
+                time.sleep(0.05)
 
 
 
