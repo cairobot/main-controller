@@ -220,7 +220,7 @@ class Server:
                 # broadcast ip and port to other devices every 5 seconds
                 curr_time = int(1000 * time.time())
                 if self.broadcast and curr_time - self.last_time >= Server.BROADCAST_RATE and not self.cliIsConn():
-                        self.bc.sendto('main_brain_super_server>' + self.my_ip + ':' + self.my_port + '<', (self.bc_dest, self.bc_port))
+                        self.bc.sendto('main_brain_super_server>' + self.my_port + '<', (self.bc_dest, self.bc_port))
                         self.last_time = curr_time
                 self.cliAccept()
                 self.localPrompt()
