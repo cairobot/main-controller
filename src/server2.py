@@ -31,6 +31,7 @@ import cmd_line
 class Server:
 
         CONNECTION_BUFFER_LEN = 1024
+        BROADCAST_RATE = 5000
 
         class CommandFWStart(cmd_line.Command):
 
@@ -91,6 +92,8 @@ class Server:
         def __init__(self, port, cmd_hdlr, logger):
                 self.cmd_hdlr = cmd_hdlr
                 self.logger = logger
+                self.my_ip = str(socket.gethostbyname(socket.gethostname()))
+                self.my_port = str(port)
                 self.ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.ss.bind(('', port))
                 self.ss.setblocking(False)
@@ -104,6 +107,14 @@ class Server:
                 self.cmd_hdlr.regCmd('fwstop', Server.CommandFWStop(self.cmd_hdlr, self))
                 self.cmd_hdlr.regCmd('fwselect', Server.CommandFWSelect(self.cmd_hdlr, self))
                 self.cmd_hdlr.overrideCmd('exit', Server.CommandStop(self.cmd_hdlr, self))
+
+                self.bc_dest = '<broadcast>'
+                self.bc_port = 11112
+                self.bc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                self.bc.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+                self.last_time = int(time.time() * 1000)
+                self.broadcast = True
 
 
         def setFilewalker(self, fw):
@@ -126,30 +137,6 @@ class Server:
 
 
         def cliRead(self):
-                #if self.cli == None:
-                #        return None
-                #try:
-                #        data = self.cli.recv(1024)
-                #except socket.timeout, e:
-                #        err = e.args[0]
-                #        if err == 'timed out':
-                #                # no data available
-                #                return None
-                #        else:
-                #                # error
-                #                print e
-                #                return None
-                #except socket.error, e:
-                #        if e.errno == 35:
-                #                return None
-                #        print e
-                #        return None
-                #else:
-                #        if len(data) == 0:
-                #                self.cli.close()
-                #                self.cli = None
-                #                return None
-                #        return data
                 if self.cli == None:
                         return None
                 if select.select([self.cli], [], [], 0.01)[0]:
@@ -197,15 +184,15 @@ class Server:
 
 
         def do(self):
-                # self.logger.debug('accepting...')
+                # broadcast ip and port to other devices every 5 seconds
+                curr_time = int(1000 * time.time())
+                if self.broadcast and curr_time - self.last_time >= Server.BROADCAST_RATE and not self.cliIsConn():
+                        self.bc.sendto('main_brain_super_server>' + self.my_ip + ':' + self.my_port + '<', (self.bc_dest, self.bc_port))
+                        self.last_time = curr_time
                 self.cliAccept()
-                # self.logger.debug('local prompt')
                 self.localPrompt()
-                # self.logger.debug('remote prompt')
                 self.remotePrompt()
-                # self.logger.debug('trying tick')
                 if self.fw != None and self.fw_run:
-                        # self.logger.debug('tick!')
                         self.fw.doTick()
                 time.sleep(0.05)
 
