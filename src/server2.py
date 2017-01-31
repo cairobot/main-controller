@@ -65,7 +65,7 @@ def _getLocalIp():
 class Server:
 
         CONNECTION_BUFFER_LEN = 1024
-        BROADCAST_RATE = 5000
+        BROADCAST_RATE = 1000
 
         class CommandFWStart(cmd_line.Command):
 
