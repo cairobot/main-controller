@@ -150,6 +150,8 @@ class Server:
                 self.last_time = int(time.time() * 1000)
                 self.broadcast = True
 
+                self.rec_data = ''
+
         def setFilewalker(self, fw):
                 self.fw = fw
 
@@ -160,13 +162,15 @@ class Server:
                 if self.cliIsConn():
                         return
                 try:
-                        (self.cli, _) = self.ss.accept()
+                        (self.cli, addr) = self.ss.accept()
                 except socket.error, e:
                         if e.errno == 35 or e.errno == 11:
                                 return
                         else:
                                 print e
                         return
+                else:
+                        self.logger.info('connection from ' + repr(self.cli));
 
 
         def cliRead(self):
@@ -177,18 +181,23 @@ class Server:
                                 data = self.cli.recv(1024)
                         except socket.error, e:
                                 if e.errno == 32: # borken pipe, cli disconnected
+                                        self.logger.info('disconnected: ' + repr(self.cli))
                                         self.cli = None
-
                                 return None
                         else:
+                                if len(data) == 0:
+                                        self.logger.info('disconnected: ' + repr(self.cli))
+                                        self.cli = None
+                                        return None
+                                self.logger.debug('received data: ' + repr(data))
                                 return data
                 else:
                         return None
 
 
         def cliSend(self, st):
+                self.logger.debug('sending data: ' + repr(st))
                 st = st + b'\r\n'
-                print 'sending: ' + st
                 if self.cli == None:
                         return
                 try:
@@ -205,6 +214,7 @@ class Server:
                                 return
                         cmd = cmd_line._arg_split(line.strip())
                         self.cliSend(str(cmd[:]))
+                        self.logger.debug('command: ' + repr(cmd))
                         self.cmd_hdlr.doCmd(cmd[0], cmd[1:])
 
         def remotePrompt(self):
@@ -213,14 +223,18 @@ class Server:
                         return
                 cmd = cmd_line._arg_split(cmd.strip())
                 self.cliSend(str(cmd[:]))
+                self.logger.debug('command: ' + repr(cmd))
                 self.cmd_hdlr.doCmd(cmd[0], cmd[1:])
 
 
         def do(self):
-                # broadcast ip and port to other devices every 5 seconds
+                # broadcast ip and port to other devices every BRODCAST_RATE ms
                 curr_time = int(1000 * time.time())
                 if self.broadcast and curr_time - self.last_time >= Server.BROADCAST_RATE and not self.cliIsConn():
-                        self.bc.sendto('main_brain_super_server>' + self.my_port + '<', (self.bc_dest, self.bc_port))
+                        try:
+                                self.bc.sendto('main_brain_super_server>' + self.my_port + '<', (self.bc_dest, self.bc_port))
+                        except socket.error, e:
+                                print e
                         self.last_time = curr_time
                 self.cliAccept()
                 self.localPrompt()
