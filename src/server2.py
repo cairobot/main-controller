@@ -117,6 +117,39 @@ class Server:
                 self.broadcast = True
 
 
+        def _get_interface_ip(self):
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))[20:24])
+
+
+        def getLocalIp(self):
+                ip = 'localhost'
+                try:
+                        ip = socket.gethostbyname(socket.gethostname())
+                except socket.error, e:
+                        interfaces = [
+                                'eth0',
+                                'eth1',
+                                'eth2',
+                                'wlan0',
+                                'wlan1',
+                                'wifi0',
+                                'ath0',
+                                'ath1',
+                                'ppp0',
+                        ]
+
+                        for ifname in interfaces:
+                                try:
+                                        ip = get_interface_ip(ifname)
+                                        break
+                                except IOError:
+                                        pass
+                        return ip
+                else:
+                        return ip
+
+
         def setFilewalker(self, fw):
                 self.fw = fw
 
@@ -129,7 +162,7 @@ class Server:
                 try:
                         (self.cli, _) = self.ss.accept()
                 except socket.error, e:
-                        if e.errno == 35:
+                        if e.errno == 35 or e.errno == 11:
                                 return
                         else:
                                 print e
