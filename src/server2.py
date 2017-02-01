@@ -18,6 +18,7 @@ import sys
 import fcntl
 import time
 import select
+import re
 
 import cmd_line
 
@@ -67,7 +68,7 @@ class Server:
         CONNECTION_BUFFER_LEN = 1024
         BROADCAST_RATE = 1000
 
-        STR_LINE_END_REGEX = '^.*(\r\n|\r|\n|\n\r)$'
+        STR_LINE_END_REGEX = '^.*(\r\n|\n\r|\r|\n)'
         REG_LINE_END_REGEX = re.compile(STR_LINE_END_REGEX)
 
         class CommandFWStart(cmd_line.Command):
@@ -181,11 +182,12 @@ class Server:
                         return None
                 if select.select([self.cli], [], [], 0.01)[0]:
                         try:
-                                data = self.cli.recv(1024)
+                                data = self.cli.recv(64)
                         except socket.error, e:
                                 if e.errno == 32: # borken pipe, cli disconnected
                                         self.logger.info('disconnected: ' + repr(self.cli))
                                         self.cli = None
+                                        self.cmd_hdlr.doCmd('fwstop', []);
                                 return None
                         else:
                                 if len(data) == 0:
@@ -249,7 +251,7 @@ class Server:
                 self.remotePrompt()
                 if self.fw != None and self.fw_run:
                         self.fw.doTick()
-                time.sleep(0.05)
+                time.sleep(0.01)
 
 
 
