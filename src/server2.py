@@ -67,6 +67,9 @@ class Server:
         CONNECTION_BUFFER_LEN = 1024
         BROADCAST_RATE = 1000
 
+        STR_LINE_END_REGEX = '^.*(\r\n|\r|\n|\n\r)$'
+        REG_LINE_END_REGEX = re.compile(STR_LINE_END_REGEX)
+
         class CommandFWStart(cmd_line.Command):
 
                 def __init__(self, hdlr, server):
@@ -190,7 +193,12 @@ class Server:
                                         self.cli = None
                                         return None
                                 self.logger.debug('received data: ' + repr(data))
-                                return data
+                                self.rec_data += data
+                                if Server.REG_LINE_END_REGEX.match(self.rec_data) != None:
+                                        ret = self.rec_data
+                                        self.rec_data = ''
+                                        return ret
+                                return None
                 else:
                         return None
 
