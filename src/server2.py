@@ -144,6 +144,7 @@ class Server:
                 self.cmd_hdlr.regCmd('fwstart', Server.CommandFWStart(self.cmd_hdlr, self))
                 self.cmd_hdlr.regCmd('fwstop', Server.CommandFWStop(self.cmd_hdlr, self))
                 self.cmd_hdlr.regCmd('fwselect', Server.CommandFWSelect(self.cmd_hdlr, self))
+                self.cmd_hdrl.regCmd('fwdeselect', Server.CommandFWDeselect(self.cmd_hdlr, self))
                 self.cmd_hdlr.overrideCmd('exit', Server.CommandStop(self.cmd_hdlr, self))
 
                 self.bc_dest = '<broadcast>'
