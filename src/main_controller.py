@@ -44,21 +44,21 @@ for arg in sys.argv:
                 elif arg == '-w':
                         arg_sel = 'WALKFILES'
                 elif arg == '-h':
-                        print 'server for loading and executing walkfiles'
-                        print 'args:'
-                        print '  p ... port, specify the port number'
-                        print '  i ... input, specify the input file'
-                        print '        this file controlls the server and (fifo)'
-                        print '        if - is specified, then stdin is used'
-                        print '  o ... output, please refere to -i, it behaves'
-                        print '        the same, with the exception, that it sets'
-                        print '        the output file'
-                        print '  e ... error, refere to -i'
-                        print '  d ... device, specify the rs-232 device for'
-                        print '        for issueing commands to the servos'
-                        print '  w ... specify the directory to be searched for'
-                        print '        walkfiles'
-                        print '  h ... help, print this dialog'
+                        print("server for loading and executing walkfiles")
+                        print('args:')
+                        print('  p ... port, specify the port number')
+                        print('  i ... input, specify the input file')
+                        print('        this file controlls the server and (fifo)')
+                        print('        if - is specified, then stdin is used')
+                        print('  o ... output, please refere to -i, it behaves')
+                        print('        the same, with the exception, that it sets')
+                        print('        the output file')
+                        print('  e ... error, refere to -i')
+                        print('  d ... device, specify the rs-232 device for')
+                        print('        for issueing commands to the servos')
+                        print('  w ... specify the directory to be searched for')
+                        print('        walkfiles')
+                        print('  h ... help, print this dialog')
                         sys.exit(0)
         else:
                 if arg_sel == 'PORT':
@@ -84,37 +84,37 @@ f_outfile = None
 f_errfile = None
 
 if s_infile == '-':
-        print 'set input file to stdin'
+        print('set input file to stdin')
         f_infile = sys.stdin
 else:
         if os.path.exists(s_infile):
                 f_infile = open(s_infile, "r")
-                print "set input file to " + s_infile
+                print( "set input file to ") + s_infile
         else:
-                print "failed to set input file, falling back to stdin"
+                print( "failed to set input file, falling back to stdin")
                 f_infile = sys.stdin
 
 
 if s_outfile == '-':
-        print 'set output file to stdout'
+        print('set output file to stdout')
         f_outfile = sys.stdout
 else:
         if os.path.exists(s_outfile):
                 f_outfile = open(s_outfile, "w")
-                print "set output file to " + s_outfile
+                print( "set output file to ") + s_outfile
         else:
-                print "failed to set output file, falling back to stdout"
+                print( "failed to set output file, falling back to stdout")
                 f_outfile = sys.stdout
 
 if s_errfile == '-':
-        print 'set error file to stderr'
+        print('set error file to stderr')
         f_errfile = sys.stderr
 else:
         if os.path.exists(s_errfile):
                 f_errfile = open(s_errfile, "w")
-                print "set error file to " + s_errfile
+                print( "set error file to ") + s_errfile
         else:
-                print "failed to set error file, falling back to stderr"
+                print( "failed to set error file, falling back to stderr")
                 f_errfile = sys.stderr
 
 

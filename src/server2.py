@@ -37,7 +37,7 @@ def _getLocalIp():
         ip = 'localhost'
         try:
                 ip = socket.gethostbyname(socket.gethostname())
-        except socket.error, e:
+        except socket.error as e:
                 interfaces = [
                         'eth0',
                         'eth1',
@@ -168,11 +168,11 @@ class Server:
                         return
                 try:
                         (self.cli, addr) = self.ss.accept()
-                except socket.error, e:
+                except socket.error as e:
                         if e.errno == 35 or e.errno == 11:
                                 return
                         else:
-                                print e
+                                print(e)
                         return
                 else:
                         self.logger.info('connection from ' + repr(self.cli));
@@ -181,10 +181,11 @@ class Server:
         def cliRead(self):
                 if self.cli == None:
                         return None
+
                 if select.select([self.cli], [], [], 0.01)[0]:
                         try:
                                 data = self.cli.recv(64)
-                        except socket.error, e:
+                        except socket.error as e:
                                 if e.errno == 32: # borken pipe, cli disconnected
                                         self.logger.info('disconnected: ' + repr(self.cli))
                                         self.cli = None
@@ -196,7 +197,7 @@ class Server:
                                         self.cli = None
                                         return None
                                 self.logger.debug('received data: ' + repr(data))
-                                self.rec_data += data
+                                self.rec_data += data.decode('UTF-8')
                                 if Server.REG_LINE_END_REGEX.match(self.rec_data) != None:
                                         ret = self.rec_data
                                         self.rec_data = ''
@@ -208,12 +209,12 @@ class Server:
 
         def cliSend(self, st):
                 self.logger.debug('sending data: ' + repr(st))
-                st = st + b'\r\n'
+                st += '\r\n'
                 if self.cli == None:
                         return
                 try:
-                        self.cli.sendall(st)
-                except socket.error, e:
+                        self.cli.sendall(st.encode('UTF-8'))
+                except socket.error as e:
                         if e.errno == 32: # borken pipe, cli disconnected
                                 self.cli = None
 
@@ -243,9 +244,9 @@ class Server:
                 curr_time = int(1000 * time.time())
                 if self.broadcast and curr_time - self.last_time >= Server.BROADCAST_RATE and not self.cliIsConn():
                         try:
-                                self.bc.sendto('main_brain_super_server>' + self.my_port + '<', (self.bc_dest, self.bc_port))
-                        except socket.error, e:
-                                print e
+                                self.bc.sendto(('main_brain_super_server>' + self.my_port + '<').encode('UTF-8'), (self.bc_dest, self.bc_port))
+                        except socket.error as e:
+                                print(e)
                         self.last_time = curr_time
                 self.cliAccept()
                 self.localPrompt()

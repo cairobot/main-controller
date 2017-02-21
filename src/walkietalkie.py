@@ -165,7 +165,14 @@ class Step:
                 self.delay = 0
 
         def __repr__(self):
-                return 'Step()[' + 'pos=' + str(self.pos) + ', delay=' + str(self.delay) + ']'
+                rep = 'Step()[pos=['
+                for i in range(0, 12):
+                        rep += str(int(((self.pos[i]-36.0)*191.0)/(157.0-36.0)))
+                        rep += ', '
+                rep += '], delay='
+                rep += str(self.delay)
+                rep += ']'
+                return rep
 
         ##
         # Sets the delay of this Step in ms resolution.
@@ -526,7 +533,7 @@ class Program:
                                                         line1 = None
 
                                         else:
-                                                print 'error'
+                                                print('error')
 
         ##
         # Performs a crude validation of the program, checking if it is possible to execute it.
@@ -614,6 +621,7 @@ class MotorDistributor:
         # @param addr   the address of the PiC
         # @returns      True on success
         def setPicAddr(self, addr):
+                addr = int(addr)
                 if addr < 0 or addr > 3:
                         return False
                 self.bts[0] |= addr << 5
@@ -624,6 +632,7 @@ class MotorDistributor:
         # @param addr   the address of the servo
         # @returns      True on success
         def setServoAddr(self, addr):
+                addr = int(addr)
                 if addr < 0 or addr > 3:
                         return False
                 self.bts[0] |= (addr << 3)
@@ -635,6 +644,7 @@ class MotorDistributor:
         # @param mode   the mode to use
         # @returns      True on success
         def setMode(self, mode):
+                mode = int(mode)
                 if mode < 0 or mode > 3:
                         return False
                 self.bts[0] |= mode << 1
@@ -645,6 +655,7 @@ class MotorDistributor:
         # @param val    the value of the servo
         # @returns      True on success
         def setServoVal(self, val):
+                val = int(val)
                 if val < 0 or val > 0xff:
                         return False
                 self.bts[0] |= (val >> 7) & 0x01
@@ -791,11 +802,11 @@ class FileWalker(Walker):
         # Sends all the data for a complete Step to the hardware.
         # @param stp    the Step to send
         def doStep(self, stp):
-                print str(stp)
+                self.logger.debug(str(stp))
                 if self.motd == None:
                         return
 
-                # print '---'
+                # print('---')
                 for i in range(0, 12):
                         # print str(i/4 + 1) + '/' + str(i%4)
                         self.motd.reset()
@@ -826,7 +837,6 @@ class FileWalker(Walker):
                 sttime = _getTime()
                 stp = self.getNextStep()
                 if stp != None:
-                        self.logger.debug("stepping: " + repr(stp))
                         self.is_stop = False
                         self.doStep(stp)
                         self.setNextDiff(stp.delay)
@@ -842,11 +852,11 @@ class FileWalker(Walker):
 # CODE
 #
 # ua = uart.Uart('/dev/tty.PL2303-00002014')
-# print '  opening: ' + str(ua.open())
+# print('  opening: ') + str(ua.open())
 # motd = MotorDistributor(ua)
 # fw = FileWalker(motd)
-# print '  loading: ' + str(fw.loadProgram('./walkfiles/test.walk'))
-# print '  loading: ' + str(fw.loadProgram('./walkfiles/mot-ex.walk'))
-# print 'selecting: ' + str(fw.selectProgram('Mot Test'))
+# print('  loading: ') + str(fw.loadProgram('./walkfiles/test.walk'))
+# print('  loading: ') + str(fw.loadProgram('./walkfiles/mot-ex.walk'))
+# print('selecting: ') + str(fw.selectProgram('Mot Test'))
 # while 1:
 #         fw.doTick()
