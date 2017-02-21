@@ -28,37 +28,44 @@ import cmd_line
 
 # taken from so: http://stackoverflow.com/questions/11735821/python-get-localhost-ip
 # user credit: sloth
-def _get_interface_ip(ifname):
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))[20:24])
+# def _get_interface_ip(ifname):
+#         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#         return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))[20:24])
 
+
+# def _getLocalIp():
+#         ip = 'localhost'
+#         try:
+#                 ip = socket.gethostbyname(socket.gethostname())
+#         except socket.error as e:
+#                 interfaces = [
+#                         'eth0',
+#                         'eth1',
+#                         'eth2',
+#                         'wlan0',
+#                         'wlan1',
+#                         'wifi0',
+#                         'ath0',
+#                         'ath1',
+#                         'ppp0',
+#                 ]
+
+#                 for ifname in interfaces:
+#                         try:
+#                                 ip = _get_interface_ip(ifname)
+#                                 break
+#                         except IOError:
+#                                 pass
+#                 return ip
+#         else:
+#                 return ip
 
 def _getLocalIp():
-        ip = 'localhost'
-        try:
-                ip = socket.gethostbyname(socket.gethostname())
-        except socket.error as e:
-                interfaces = [
-                        'eth0',
-                        'eth1',
-                        'eth2',
-                        'wlan0',
-                        'wlan1',
-                        'wifi0',
-                        'ath0',
-                        'ath1',
-                        'ppp0',
-                ]
-
-                for ifname in interfaces:
-                        try:
-                                ip = _get_interface_ip(ifname)
-                                break
-                        except IOError:
-                                pass
-                return ip
-        else:
-                return ip
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect('www.google.com', 80)
+        ret = s.getsockname()[0]
+        s.close()
+        return ret
 
 ###
 # CLASSES

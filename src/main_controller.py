@@ -89,7 +89,7 @@ if s_infile == '-':
 else:
         if os.path.exists(s_infile):
                 f_infile = open(s_infile, "r")
-                print( "set input file to ") + s_infile
+                print( "set input file to " + s_infile)
         else:
                 print( "failed to set input file, falling back to stdin")
                 f_infile = sys.stdin
@@ -101,7 +101,7 @@ if s_outfile == '-':
 else:
         if os.path.exists(s_outfile):
                 f_outfile = open(s_outfile, "w")
-                print( "set output file to ") + s_outfile
+                print( "set output file to " + s_outfile)
         else:
                 print( "failed to set output file, falling back to stdout")
                 f_outfile = sys.stdout
@@ -112,7 +112,7 @@ if s_errfile == '-':
 else:
         if os.path.exists(s_errfile):
                 f_errfile = open(s_errfile, "w")
-                print( "set error file to ") + s_errfile
+                print( "set error file to " + s_errfile)
         else:
                 print( "failed to set error file, falling back to stderr")
                 f_errfile = sys.stderr
