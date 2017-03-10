@@ -828,6 +828,7 @@ class FileWalker(Walker):
         # - the time difference requirement is met
         # and getNextStep() returns a valid Step
         def doTick(self):
+                print(self.motd.uart.read());
                 if self.select == None:
                         return
 
