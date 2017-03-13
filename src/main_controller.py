@@ -142,7 +142,8 @@ else:
 
 # set up motor distributor
 log_.info('Creating motor distributor...')
-md = walkietalkie.MotorDistributor(ua)
+# md = walkietalkie.MotorDistributor(ua)
+md = walkietalkie.MotorDistributor(f_outfile)
 log_.info('done')
 
 # set up file walker and load programs
