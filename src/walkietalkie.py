@@ -26,6 +26,7 @@ import time
 import re
 import uart
 import logger
+import sys
 
 #
 # PRIVATE VARIABLES and FUNCTIONS
@@ -673,10 +674,13 @@ class MotorDistributor:
         # Since the PiC can't receive data that fast, a delay of
         # 50&mu;s is required to prevent data loss.
         def send(self):
-                self.uart.putc(self.bts[0])
-                time.sleep(50*10.0**(-6))
-                self.uart.putc(self.bts[1])
-                time.sleep(50*10.0**(-6))
+                # self.uart.putc(self.bts[0])
+                # time.sleep(50*10.0**(-6))
+                # self.uart.putc(self.bts[1])
+                # time.sleep(50*10.0**(-6))
+
+                self.uart.write(bytearray(self.bts))
+
                 # time.sleep(0.1)
                 # _ = self.uart.read()
 
