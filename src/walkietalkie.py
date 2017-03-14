@@ -680,10 +680,10 @@ class MotorDistributor:
                 # time.sleep(50*10.0**(-6))
                 self.uart.write(bytearray([self.bts[0]]))
                 self.uart.flush()
-                time.sleep(50*10.0**(-6))
+                time.sleep(100*10.0**(-6))
                 self.uart.write(bytearray([self.bts[1]]))
                 self.uart.flush()
-                time.sleep(50*10**(-6))
+                time.sleep(100*10**(-6))
                 # _ = self.uart.read()
 
 ##

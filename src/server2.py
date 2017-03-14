@@ -142,13 +142,11 @@ class Server:
                         pic_id = argv[0][0]
                         ser_id = argv[0][1]
                         ser_va = int(argv[1])
-                        # print(pic_id)
-                        # print(ser_id)
-                        # print(ser_va)
-                        pic_id = (ord(pic_id) - ord('A'))
-                        ser_id = (ord(ser_id) - ord('A'))
-                        print(str(pic_id))
-                        print(str(ser_id))
+                        pic_id = ord(pic_id) - ord('A') + 1
+                        ser_id = ord(ser_id) - ord('A')
+                        
+                        self.server.logger.debug(str(pic_id))
+                        self.server.logger.debug(str(ser_id))
 
                         self.server.fw.motd.reset()
                         self.server.fw.motd.setMode(0)
