@@ -151,11 +151,11 @@ class Server:
                         print(str(ser_id))
 
                         self.server.fw.motd.reset()
-                        self.motd.setMode(0)
-                        self.motd.setPicAddr(pic_id)
-                        self.motd.setServoAddr(ser_id)
-                        self.motd.setServoVal(36.0+(157.0-36.0)*ser_va/(191.0))
-                        self.motd.send()
+                        self.server.fw.motd.setMode(0)
+                        self.server.fw.motd.setPicAddr(pic_id)
+                        self.server.fw.motd.setServoAddr(ser_id)
+                        self.server.fw.motd.setServoVal(36.0+(157.0-36.0)*ser_va/(191.0))
+                        self.server.fw.motd.send()
 
 
 
@@ -219,41 +219,75 @@ class Server:
                         try:
                                 data = self.cli.recv(64)
                         except socket.error as e:
-                                if e.errno == 32: # broken pipe, cli disconnected
+                                if e.errno == 32: # broken pip, cli dis
                                         self.logger.info('disconnected: ' + repr(self.cli))
                                         self.cli = None
-                                        self.cmd_hdlr.doCmd('fwstop', []);
+                                        self.cmd_hdlr.doCmd('fwstop', [])
                                 return None
                         else:
                                 if len(data) == 0:
                                         self.logger.info('disconnected: ' + repr(self.cli))
                                         self.cli = None
+                                        self.cmd_hdlr.doCmd('fwstop', [])
                                         return None
-                                self.logger.debug('received data: ' + repr(data))
                                 self.rec_data += data.decode('UTF-8')
+                                self.logger.debug('received data: ' + repr(data))
                                 self.logger.debug('total data in q: ' + repr(self.rec_data))
-                                if Server.REG_LINE_END_REGEX.match(self.rec_data) != None:
-                                        ret = self.rec_data
-                                        self.rec_data = ''
-                                        array = ret.split('\r\n')
-                                        if len(array) >= 2:
-                                                self.rec_data = '\r\n'.join(array[1:])
-                                                if len(self.rec_data) >= 2 and self.rec_data[0] == '\r' and self.rec_data[1] == '\n':
-                                                        self.rec_data = self.rec_data[2:]
-                                                return array[0]
-                                        return ret
-                                return None
-                else:
-                        ret = self.rec_data
-                        self.rec_data = ''
-                        array = ret.split('\r\n')
-                        if len(array) >= 2:
-                                self.rec_data = '\r\n'.join(array[1:])
-                                if len(self.rec_data) >= 2 and self.rec_data[0] == '\r' and self.rec_data[1] == '\n':
-                                        self.rec_data = self.rec_data[2:]
-                                return array[0]
-                        return None
 
+                # if self.cli == None:
+                #         return None
+
+                # if select.select([self.cli], [], [], 0.01)[0]:
+                #         try:
+                #                 data = self.cli.recv(64)
+                #         except socket.error as e:
+                #                 if e.errno == 32: # broken pipe, cli disconnected
+                #                         self.logger.info('disconnected: ' + repr(self.cli))
+                #                         self.cli = None
+                #                         self.cmd_hdlr.doCmd('fwstop', []);
+                #                 return None
+                #         else:
+                #                 if len(data) == 0:
+                #                         self.logger.info('disconnected: ' + repr(self.cli))
+                #                         self.cli = None
+                #                         return None
+                #                 self.logger.debug('received data: ' + repr(data))
+                #                 self.rec_data += data.decode('UTF-8')
+                #                 self.logger.debug('total data in q: ' + repr(self.rec_data))
+                #                 if Server.REG_LINE_END_REGEX.match(self.rec_data) != None:
+                #                         ret = self.rec_data
+                #                         self.rec_data = ''
+                #                         array = ret.split('\r\n')
+                #                         if len(array) >= 2:
+                #                                 self.rec_data = '\r\n'.join(array[1:])
+                #                                 if len(self.rec_data) >= 2 and self.rec_data[0] == '\r' and self.rec_data[1] == '\n':
+                #                                         self.rec_data = self.rec_data[2:]
+                #                                 return array[0]
+                #                         else:
+                #                                 self.rec_data = array[0]
+                #                                 return None
+                #                         return ret
+                #                 return None
+                # else:
+                #         ret = self.rec_data
+                #         self.rec_data = ''
+                #         array = ret.split('\r\n')
+                #         if len(array) >= 2:
+                #                 self.rec_data = '\r\n'.join(array[1:])
+                #                 if len(self.rec_data) >= 2 and self.rec_data[0] == '\r' and self.rec_data[1] == '\n':
+                #                         self.rec_data = self.rec_data[2:]
+                #                 return array[0]
+                #         return None
+
+        def cliGetMsg(self):
+                msgs = self.rec_data.split('\r\n')
+                if len(msgs) > 1:
+                        self.rec_data = '\r\n'.join(msgs[1:])
+                        return msgs[0]
+                elif self.rec_data.endswith('\r\n'):
+                        self.rec_data = ''
+                        return msgs[0]
+                return None
 
         def cliSend(self, st):
                 self.logger.debug('sending data: ' + repr(st))
@@ -278,7 +312,8 @@ class Server:
                         self.cmd_hdlr.doCmd(cmd[0], cmd[1:])
 
         def remotePrompt(self):
-                cmd = self.cliRead()
+                self.cliRead()
+                cmd = self.cliGetMsg()
                 if cmd == None:
                         return
                 cmd = cmd_line._arg_split(cmd.strip())
