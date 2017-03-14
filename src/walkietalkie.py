@@ -24,7 +24,7 @@ import abc
 import math
 import time
 import re
-import uart
+# import uart
 import logger
 import sys
 
@@ -820,7 +820,6 @@ class FileWalker(Walker):
                         self.motd.setServoAddr(i % 4)
                         self.motd.setServoVal(stp.getRawVal(i))
                         self.motd.send()
-                        print(repr(self.motd))
 
         ##
         # Sets the next target time difference.

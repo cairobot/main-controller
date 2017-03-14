@@ -132,6 +132,31 @@ class Server:
                         self.server.logger.info("stopping server")
                         self.hndlr.doCmd('fwstop')
 
+        class CommandSetServo(cmd_line.Command):
+
+                def __init__(self, hdlr, server):
+                        cmd_line.Command.__init__(self, hdlr)
+                        self.server = server
+
+                def do(self, argv):
+                        pic_id = argv[0][0]
+                        ser_id = argv[0][1]
+                        ser_va = int(argv[1])
+                        # print(pic_id)
+                        # print(ser_id)
+                        # print(ser_va)
+                        pic_id = (ord(pic_id) - ord('A'))
+                        ser_id = (ord(ser_id) - ord('A'))
+                        print(str(pic_id))
+                        print(str(ser_id))
+
+                        self.server.fw.motd.reset()
+                        self.motd.setMode(0)
+                        self.motd.setPicAddr(pic_id)
+                        self.motd.setServoAddr(ser_id)
+                        self.motd.setServoVal(36.0+(157.0-36.0)*ser_va/(191.0))
+                        self.motd.send()
+
 
 
         def __init__(self, port, cmd_hdlr, logger):
@@ -152,6 +177,7 @@ class Server:
                 self.cmd_hdlr.regCmd('fwstop', Server.CommandFWStop(self.cmd_hdlr, self))
                 self.cmd_hdlr.regCmd('fwselect', Server.CommandFWSelect(self.cmd_hdlr, self))
                 self.cmd_hdlr.regCmd('fwdeselect', Server.CommandFWDeselect(self.cmd_hdlr, self))
+                self.cmd_hdlr.regCmd('servo', Server.CommandSetServo(self.cmd_hdlr, self))
                 self.cmd_hdlr.overrideCmd('exit', Server.CommandStop(self.cmd_hdlr, self))
 
                 self.bc_dest = '<broadcast>'
@@ -193,7 +219,7 @@ class Server:
                         try:
                                 data = self.cli.recv(64)
                         except socket.error as e:
-                                if e.errno == 32: # borken pipe, cli disconnected
+                                if e.errno == 32: # broken pipe, cli disconnected
                                         self.logger.info('disconnected: ' + repr(self.cli))
                                         self.cli = None
                                         self.cmd_hdlr.doCmd('fwstop', []);
@@ -205,12 +231,27 @@ class Server:
                                         return None
                                 self.logger.debug('received data: ' + repr(data))
                                 self.rec_data += data.decode('UTF-8')
+                                self.logger.debug('total data in q: ' + repr(self.rec_data))
                                 if Server.REG_LINE_END_REGEX.match(self.rec_data) != None:
                                         ret = self.rec_data
                                         self.rec_data = ''
+                                        array = ret.split('\r\n')
+                                        if len(array) >= 2:
+                                                self.rec_data = '\r\n'.join(array[1:])
+                                                if len(self.rec_data) >= 2 and self.rec_data[0] == '\r' and self.rec_data[1] == '\n':
+                                                        self.rec_data = self.rec_data[2:]
+                                                return array[0]
                                         return ret
                                 return None
                 else:
+                        ret = self.rec_data
+                        self.rec_data = ''
+                        array = ret.split('\r\n')
+                        if len(array) >= 2:
+                                self.rec_data = '\r\n'.join(array[1:])
+                                if len(self.rec_data) >= 2 and self.rec_data[0] == '\r' and self.rec_data[1] == '\n':
+                                        self.rec_data = self.rec_data[2:]
+                                return array[0]
                         return None
 
 

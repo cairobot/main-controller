@@ -7,7 +7,7 @@ import stat
 import sys
 import server2
 import walkietalkie
-import uart
+# import uart
 import logger
 import cmd_line
 import threading
