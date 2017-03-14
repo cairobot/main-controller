@@ -678,10 +678,12 @@ class MotorDistributor:
                 # time.sleep(50*10.0**(-6))
                 # self.uart.putc(self.bts[1])
                 # time.sleep(50*10.0**(-6))
-
-                self.uart.write(bytearray(self.bts))
-
-                # time.sleep(0.1)
+                self.uart.write(bytearray([self.bts[0]]))
+                self.uart.flush()
+                time.sleep(50*10.0**(-6))
+                self.uart.write(bytearray([self.bts[1]]))
+                self.uart.flush()
+                time.sleep(50*10**(-6))
                 # _ = self.uart.read()
 
 ##
@@ -751,8 +753,7 @@ class FileWalker(Walker):
         # a cycle, the next first instruction from the selected section is returned again.
         # If any requirement is not met None is returned.
         # Requirements include:
-        # - a program must be selected
-        # - the timedifference must be higher or equal to the one specified by the previous Step
+        # - a program must be selected>ç        # - the timedifference must be higher or equal to the one specified by the previous Step‚
         # - if last instruction is reached: looping must be enabled
         # @returns      the next Step
         def getNextStep(self):
@@ -819,6 +820,7 @@ class FileWalker(Walker):
                         self.motd.setServoAddr(i % 4)
                         self.motd.setServoVal(stp.getRawVal(i))
                         self.motd.send()
+                        print(repr(self.motd))
 
         ##
         # Sets the next target time difference.
@@ -832,7 +834,7 @@ class FileWalker(Walker):
         # - the time difference requirement is met
         # and getNextStep() returns a valid Step
         def doTick(self):
-                print(self.motd.uart.read());
+                # print(self.motd.uart.read());
                 if self.select == None:
                         return
 

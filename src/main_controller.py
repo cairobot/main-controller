@@ -134,16 +134,17 @@ log_.info('Opening uart connection on: ' + str(s_device) + '...')
 if s_device == None:
         log_.warn("No uart device specified")
 
-ua = uart.Uart(s_device)
-if ua.open():
-        log_.info('done')
-else:
-        log_.err('fail')
+# ua = uart.Uart(s_device)
+ua = open(str(s_device), 'wb')
+#if ua.open():
+#        log_.info('done')
+#else:
+#        log_.err('fail')
 
 # set up motor distributor
 log_.info('Creating motor distributor...')
-# md = walkietalkie.MotorDistributor(ua)
-md = walkietalkie.MotorDistributor(f_outfile)
+md = walkietalkie.MotorDistributor(ua)
+# md = walkietalkie.MotorDistributor(f_outfile)
 log_.info('done')
 
 # set up file walker and load programs

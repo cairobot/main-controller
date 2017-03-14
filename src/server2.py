@@ -62,7 +62,7 @@ import cmd_line
 
 def _getLocalIp():
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect('www.google.com', 80)
+        s.connect(('www.google.com', 80))
         ret = s.getsockname()[0]
         s.close()
         return ret
