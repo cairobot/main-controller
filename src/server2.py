@@ -86,6 +86,7 @@ class Server:
 
                 def do(self, argv):
                         self.server.logger.info("starting filewalker")
+                        self.server.cliSend("starting filewalker")
                         self.server.fw_run = True
 
         class CommandFWStop(cmd_line.Command):
@@ -96,6 +97,7 @@ class Server:
 
                 def do(self, argv):
                         self.server.logger.info("stopping filewalker")
+                        self.server.cliSend("stopping filewalker")
                         self.server.fw_run = False
 
         class CommandFWSelect(cmd_line.Command):
@@ -107,10 +109,12 @@ class Server:
                 def do(self, argv):
                         if len(argv) == 0:
                                 self.server.logger.info("deselecting program")
+                                self.server.cliSend("deselecting program")
                                 self.server.fw.should_stop = True
                                 self.server.logger.info("done")
                         elif len(argv) == 1:
                                 self.server.logger.info("selected program: " + argv[0])
+                                self.server.cliSend("selected program: " + argv[0])
                                 self.server.fw.selectProgram(argv[0])
 
         class CommandFWDeselect(cmd_line.Command):
@@ -121,16 +125,6 @@ class Server:
 
                 def do(self, argv):
                         self.hndlr.doCmd('fwselect', [])
-
-        class CommandStop(cmd_line.Command):
-
-                def __init__(self, hdlr, server):
-                        cmd_line.Command.__init__(self, hdlr)
-                        self.server = server
-
-                def do(self, argv):
-                        self.server.logger.info("stopping server")
-                        self.hndlr.doCmd('fwstop')
 
         class CommandSetServo(cmd_line.Command):
 
@@ -155,6 +149,30 @@ class Server:
                         self.server.fw.motd.setServoVal(36.0+(157.0-36.0)*ser_va/(191.0))
                         self.server.fw.motd.send()
 
+        class CommandDoStep(cmd_line.Command):
+
+                def __init__(self, hdlr, server):
+                        cmd_line.Command.__init__(self, hdlr)
+                        self.server = server
+
+                def do(self, argv):
+                        self.server.logger.info("doing step")
+                        self.server.cliSend("doing step")
+                        stp = self.server.fw.getNextStep()
+                        if stp != None:
+                                self.server.fw.doStep(stp)
+
+        class CommandStop(cmd_line.Command):
+
+                def __init__(self, hdlr, server):
+                        cmd_line.Command.__init__(self, hdlr)
+                        self.server = server
+
+                def do(self, argv):
+                        self.server.logger.info("stopping server")
+                        self.server.cliSend("stopping server")
+                        self.hndlr.doCmd('fwstop')
+
 
 
         def __init__(self, port, cmd_hdlr, logger):
@@ -176,6 +194,7 @@ class Server:
                 self.cmd_hdlr.regCmd('fwselect', Server.CommandFWSelect(self.cmd_hdlr, self))
                 self.cmd_hdlr.regCmd('fwdeselect', Server.CommandFWDeselect(self.cmd_hdlr, self))
                 self.cmd_hdlr.regCmd('servo', Server.CommandSetServo(self.cmd_hdlr, self))
+                self.cmd_hdlr.regCmd('dostep', Server.CommandDoStep(self.cmd_hdlr, self))
                 self.cmd_hdlr.overrideCmd('exit', Server.CommandStop(self.cmd_hdlr, self))
 
                 self.bc_dest = '<broadcast>'
@@ -231,51 +250,6 @@ class Server:
                                 self.rec_data += data.decode('UTF-8')
                                 self.logger.debug('received data: ' + repr(data))
                                 self.logger.debug('total data in q: ' + repr(self.rec_data))
-
-                # if self.cli == None:
-                #         return None
-
-                # if select.select([self.cli], [], [], 0.01)[0]:
-                #         try:
-                #                 data = self.cli.recv(64)
-                #         except socket.error as e:
-                #                 if e.errno == 32: # broken pipe, cli disconnected
-                #                         self.logger.info('disconnected: ' + repr(self.cli))
-                #                         self.cli = None
-                #                         self.cmd_hdlr.doCmd('fwstop', []);
-                #                 return None
-                #         else:
-                #                 if len(data) == 0:
-                #                         self.logger.info('disconnected: ' + repr(self.cli))
-                #                         self.cli = None
-                #                         return None
-                #                 self.logger.debug('received data: ' + repr(data))
-                #                 self.rec_data += data.decode('UTF-8')
-                #                 self.logger.debug('total data in q: ' + repr(self.rec_data))
-                #                 if Server.REG_LINE_END_REGEX.match(self.rec_data) != None:
-                #                         ret = self.rec_data
-                #                         self.rec_data = ''
-                #                         array = ret.split('\r\n')
-                #                         if len(array) >= 2:
-                #                                 self.rec_data = '\r\n'.join(array[1:])
-                #                                 if len(self.rec_data) >= 2 and self.rec_data[0] == '\r' and self.rec_data[1] == '\n':
-                #                                         self.rec_data = self.rec_data[2:]
-                #                                 return array[0]
-                #                         else:
-                #                                 self.rec_data = array[0]
-                #                                 return None
-                #                         return ret
-                #                 return None
-                # else:
-                #         ret = self.rec_data
-                #         self.rec_data = ''
-                #         array = ret.split('\r\n')
-                #         if len(array) >= 2:
-                #                 self.rec_data = '\r\n'.join(array[1:])
-                #                 if len(self.rec_data) >= 2 and self.rec_data[0] == '\r' and self.rec_data[1] == '\n':
-                #                         self.rec_data = self.rec_data[2:]
-                #                 return array[0]
-                #         return None
 
         def cliGetMsg(self):
                 msgs = self.rec_data.split('\r\n')
