@@ -314,7 +314,7 @@ class Function:
         def setInt(self, min, max):
                 mi = int(min)
                 ma = int(max)
-                if mi < ma:
+                if ma < mi:
                         self.setInt(ma, mi)
                 else:
                         self.int_min = mi
@@ -549,7 +549,9 @@ class Program:
                                 return False
                         for fc in self.mot_fcs:
                                 if len(fc.fcs) == 0:
+                                        print("CASE")
                                         return False
+                        return True
                 elif self.use == 'prg':
                         return True
                 else:

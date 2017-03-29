@@ -115,7 +115,7 @@ class Server:
                         elif len(argv) == 1:
                                 self.server.logger.info("selected program: " + argv[0])
                                 self.server.cliSend("selected program: " + argv[0])
-                                self.server.fw.selectProgram(argv[0])
+                                print('selecting: ' + str(self.server.fw.selectProgram(argv[0])))
 
         class CommandFWDeselect(cmd_line.Command):
 
@@ -274,7 +274,7 @@ class Server:
 
 
         def localPrompt(self):
-                if select.select([self.cmd_hdlr.inf], [], [], 0.01)[0]:
+                if select.select([self.cmd_hdlr.inf], [], [], 0.0)[0]:
                         line = self.cmd_hdlr.inf.readline()
                         if not line:
                                 return
@@ -308,7 +308,6 @@ class Server:
                 self.remotePrompt()
                 if self.fw != None and self.fw_run:
                         self.fw.doTick()
-                time.sleep(0.01)
 
 
 
